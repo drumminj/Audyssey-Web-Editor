@@ -1,9 +1,58 @@
 :host {
+  color: #123;
   display: block;
   padding: 10px;
 
   @media (max-width: 500px) {
     padding: 0
+  }
+
+  // Global adjustment to sizing of form field wrappers
+  ::ng-deep .mat-mdc-form-field-infix {
+    min-height: unset !important;
+    padding: 10px 0 !important;
+    width: unset !important;
+  }
+
+  // Global style for buttons
+  ::ng-deep button:not(.mdc-switch) {
+    height: auto;
+    padding: 12px;
+  
+    .label {
+      align-items: center;
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+
+    // Icon-only button with less padding
+    &.icon-only-btn {
+      line-height: 1;
+      min-width: unset;
+      padding: 6px;
+    
+      mat-icon {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+
+  ::ng-deep mat-button-toggle-group {
+    background-color: #777;
+    border-color: #a0a0a0;
+    --mat-standard-button-toggle-selected-state-text-color: white;
+    --mat-standard-button-toggle-selected-state-background-color: #555;
+
+    button.mat-button-toggle-button {
+      font-size: 12px;
+      padding: 4px;
+
+      span.mat-button-toggle-label-content {
+        line-height: 1;
+      }
+    }
   }
 }
 
@@ -31,8 +80,6 @@
   }
 
   @media (max-width: 500px) {
-    //justify-content: center;
-
     select, span {
       display: none;
     }
@@ -48,22 +95,17 @@
 
 main {
   display: flex;
+  align-items: flex-start;
 
   @media (max-width: 500px) {
     flex-direction: column;
   }
 }
 
-.multi-EQ-type {
-  background: white; border: none; appearance: none;
-  font-size: 15px;
-}
-
-mat-card {
-  //padding: 20px;
+mat-card, system-info-card {
   margin: 10px;
 
-  mat-card-header {
+  ::ng-deep mat-card-header {
     margin-top: -4px;
     margin-bottom: 15px;
     font-weight: bold;
@@ -72,46 +114,197 @@ mat-card {
 
 .info-panels {
   --mat-expansion-header-text-size: 16px;
-  width: 260px;
-  margin: 10px;
-
   @media (max-width: 600px) {
     width: 95%;
   }
 }
 
-.channel-radio-group {
+//
+
+.left-panel {
+  flex: 0 0 auto;
+  max-width: 300px;
+  min-width: 240px;
+  overflow: hidden;
+
+  .export-card {
+    align-items: stretch;
     display: flex;
     flex-direction: column;
-    margin-top: -10px;
+  }
+}
 
-    .channel-radio-button {
-        margin-bottom: -2px;
-        //user-select: none;
+.profile-container {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .profile-input {
+    flex: 1 1 auto;
+    input  {
+      font-weight: bold;
+      text-align: center;
     }
+  } 
 }
 
-.curve-points-container {
-    max-height: 432px;
-    overflow-y: auto;
+.right-panel {
+  flex: 1 1 0;
+  overflow: hidden;
 }
 
-.curve-points-text-field {
-    font-size: large;
-    border: none;
+.channel-container {
+  align-content: center;
+  column-gap: 6px;
+  grid-template-columns: minmax(min-content, 0.7fr) repeat(4, 1fr);
+  display: grid;
+  margin-top: 6px;
+  row-gap: 12px;
+
+  .speaker-name {
+    align-items: center;
+    justify-content: flex-end;
+    color: #999;
+    display: flex;
+    font-weight: 500;
+    margin: 2px 10px 0 0;
+    padding: 0;
+    text-align: right;
+  }
 }
 
-.expansion-panel-first-line {
-  margin-top: -4px;
-  margin-bottom: 20px;
-}
+.speed-sound-card, .auto-leveling-card {
+  background-color: #eee;
+  margin: 20px 0 0 0;
 
-.chart-card {
-  flex-grow: 1;
+  mat-card-header {
+    align-items: center;
+    display: flex;
 
-  @media (max-width: 600px) {
-    .mat-mdc-card-content {
-      padding-left: 0;
+    mat-icon {
+      margin-right: 6px;
     }
+  }
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.speed-sound-btn {
+  margin-top: 12px;
+}
+
+.house-curve-option:after {
+  border-bottom: solid 1px #ccc;
+  content: '';
+  left: 16px;
+  position: absolute;
+  right: 16px;
+  bottom: 0;
+  z-index: 1;
+}
+
+.target-curve-content {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+
+  > mat-card {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .control-points-drawer {
+    background-color: #333;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    color: white;
+
+    ::ng-deep .mat-drawer-inner-container {
+      align-items: stretch;
+      display: flex;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+
+      button.close-btn {
+        background-color: transparent;
+        color: #ccc;
+        padding: 2px;
+
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
+
+    .toolbar {
+      align-items: center;
+      background-color: #555;
+      border-radius: 4px;
+      display: flex;
+      justify-content: flex-end;
+
+      > button {
+        border-radius: 0;
+        border-right: 1px solid #777;
+        color: #ccc;
+
+        &:hover {
+          color: #fff;
+        }
+
+        &:last-child {
+          border: none;
+        }
+      }
+    }
+  }
+
+  .load-control-pts-btn {
+    margin-top: 4px;
+    padding: 6px 12px;
+  }
+}
+
+.house-curve-card {
+  background-color: #eee;
+}
+
+.edit-control-pts {
+  opacity: 85%;
+  position: absolute;
+  right: 22px;
+  bottom: 78px;
+  z-index: 1;
+}
+
+.comp-limit-slider {
+  bottom: 40px;
+  left: 60px;
+  opacity: 65%;
+  position: absolute;
+  right: 4px;
+  z-index: 1;
+
+  &:hover {
+    opacity: 100%;
+  }
+
+  ::ng-deep span.mdc-slider__value-indicator-text {
+    white-space: nowrap;
   }
 }

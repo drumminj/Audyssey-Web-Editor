@@ -1,0 +1,31 @@
+<mat-card class="system-info">
+    <mat-card-header>
+        <mat-card-title>System</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="system-info-element">
+            <span class="label">Device: </span>
+            <span class="value">{{audysseyData.targetModelName}}</span>
+        </div>
+        <div class="system-info-element">
+            <span class="label">Audyssey Version: </span>
+            <span class="value">{{audysseyData.enMultEQType | decodeEqType}}</span>
+        </div>
+        <div class="options-label">Options:</div>
+        <div class="options-container">
+            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" >
+                <mat-label>Target Sound</mat-label>
+                <mat-select [ngModel]="audysseyData.enTargetCurveType" (ngModelChange)="setTargetCurve($event)">
+                    <mat-option [value]="1">HF Rolloff 1</mat-option>
+                    <mat-option [value]="2">HF Rolloff 2</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-slide-toggle color="accent" [ngModel]="audysseyData.dynamicEq" [disabled]="!audysseyData.detectedChannels.length" (ngModelChange)="setDynamicEQ($event)">
+                Dynamic EQ
+            </mat-slide-toggle>
+            <mat-slide-toggle color="accent" [ngModel]="audysseyData.dynamicVolume" [disabled]="!audysseyData.detectedChannels.length" (ngModelChange)="setDynamicVolume($event)">
+                Dynamic Volume
+            </mat-slide-toggle>
+        </div>
+    </mat-card-content>
+</mat-card>

@@ -1,24 +1,25 @@
 import {Component} from '@angular/core';
 import {AudysseyInterface} from './interfaces/audyssey-interface';
-import {DetectedChannel} from './interfaces/detected-channel';
+import {CurveFilter, DetectedChannel, ResponseData, ChannelReport} from './interfaces/detected-channel';
+import { ControlPoint } from './interfaces/control-point';
 import {decodeChannelName} from './helper-functions/decode-channel-name.pipe';
 
 import * as Highcharts from 'highcharts';
-// import Sonification from 'highcharts/modules/sonification';
 // import HC_boost from 'highcharts/modules/boost'
 // import Draggable from 'highcharts/modules/draggable-points';
-// import Datagrouping from 'highcharts/modules/datagrouping';
 import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
 import {convertToDraggablePoints, convertToNonDraggablePoints} from "./helper-functions/convert-draggable-points";
 
-// Sonification(Highcharts);
 // Draggable(Highcharts);
-// HC_boost(Highcharts);
-Exporting(Highcharts);
-// Datagrouping(Highcharts);
+// HC_boost(Highcharts);           // optimize rendering where possible
+Exporting(Highcharts);          // for context menu
 Highcharts.setOptions(options);
+
+// for controlling debug statements/logic/output
+const DEBUG = false;
+const SPEED_SOUND_FIX_FACTOR = 0.875;
 
 @Component({
   selector: 'app-root',
@@ -30,30 +31,57 @@ export class AppComponent {
   chartOptions: Highcharts.Options = { series: seriesOptions };
   chartUpdateFlag = false;
 
+  readonly crossoverFreqs = [
+    { label:"40", val: 40 },
+    { label:"60", val: 60 },
+    { label:"80", val: 80 },
+    { label:"90", val: 90 },
+    { label:"100", val: 10 },
+    { label:"110", val: 11 },
+    { label:"120", val: 12 },
+    { label:"150", val: 15 },
+    { label:"200", val: 20 },
+    { label:"250", val: 25 }
+  ];
+
   private chartObj?: Highcharts.Chart;
 
   audysseyData: AudysseyInterface = { detectedChannels: [] };
   calculatedChannelsData?: Map<string, number[][]>
 
-  selectedChannel?: DetectedChannel;
+  useHouseCurve = false;
+  houseCurveChannel: DetectedChannel = {
+    midrangeCompensation: false,
+    enChannelType: 0, 
+    isSkipMeasurement: false,
+    frequencyRangeRolloff: 0, 
+    customDistance: 0,
+    customTargetCurvePoints: [],
+    commandId: '',
+    delayAdjustment: '',
+    flatCurveFilter: {} as CurveFilter,
+    referenceCurveFilter:  {} as CurveFilter,
+    channelReport: {} as ChannelReport,
+    responseData: {} as ResponseData,
+    trimAdjustment: ''
+  }
+  selectedChannel: DetectedChannel = this.houseCurveChannel;
+  customCurvePoints: ControlPoint[] = [];
+  speedSoundFixApplied = false;
+
   chartLogarithmicScale = true;
   dataSmoothEnabled = true;
   graphSmoothEnabled = false;
+  distanceUnit = "m";
 
   // Updates context menu items for the chart based on the option's current state
   updateChartMenuItems() {
     this.chartObj?.update({
       exporting: {
         menuItemDefinitions: {
-          xScale: {
-            text: `Switch To ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
-          },
           graphSmoothing: {
-            text: `${this.graphSmoothEnabled ? "✔️" : "☐&nbsp;"} Graph Smoothing`
-          },
-          // dataSmoothing: {
-          //   text: `${this.dataSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Data Smoothing`
-          // }
+            text: `${this.graphSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Graph Smoothing`
+          }
         }
       }
     });
@@ -66,15 +94,9 @@ export class AppComponent {
       chart.options.exporting.menuItemDefinitions['xScale'].onclick = () => {
         this.chartLogarithmicScale = !this.chartLogarithmicScale;
         this.updateChart();
-        this.updateChartMenuItems(); // TODO: here we are updating graph 2 times
       }
       chart.options.exporting.menuItemDefinitions['graphSmoothing'].onclick = () => {
         this.graphSmoothEnabled = !this.graphSmoothEnabled;
-        this.updateChart();
-        this.updateChartMenuItems();
-      }
-      chart.options.exporting.menuItemDefinitions['dataSmoothing'].onclick = () => {
-        this.dataSmoothEnabled = !this.dataSmoothEnabled;
         this.updateChart();
         this.updateChartMenuItems();
       }
@@ -83,7 +105,7 @@ export class AppComponent {
     this.updateChartMenuItems();
   }
 
-  async onUpload(files: FileList | null) {
+  async onProfileUpload(files: FileList | null) {
     const fileContent = await files?.item(0)?.text();
     if (fileContent) {
       this.chartObj?.showLoading();
@@ -91,6 +113,68 @@ export class AppComponent {
       this.processDataWithWorker(this.audysseyData);
     }
     else alert('Cannot read the file');
+  }
+
+  updateControlPoints(pts: ControlPoint[]) {
+    this.customCurvePoints = pts;
+    if (this.useHouseCurve) {
+      this.houseCurveChannel.customTargetCurvePoints = pts.map(pt => `{${pt.freq}, ${pt.gain}}`);
+      this.audysseyData.detectedChannels.forEach(channel => {
+        channel.customTargetCurvePoints = pts.map(pt => `{${pt.freq}, ${pt.gain}}`)
+      });
+    } else {
+      this.selectedChannel.customTargetCurvePoints = pts.map(pt => `{${pt.freq}, ${pt.gain}}`);
+    }
+    this.updateChart();
+  }
+
+  copyControlPoints() {
+    navigator.clipboard.writeText(JSON.stringify(this.customCurvePoints));
+  }
+
+  parseControlPtsJSON(text: string) {
+    try {
+      const pts = JSON.parse(text);
+      let valid = Array.isArray(pts);
+      if (valid) {
+        for (const item of pts) {
+          valid = valid && !Number.isNaN(item.freq) && !Number.isNaN(item.gain);
+        }
+      }
+
+      if (valid) {
+        this.customCurvePoints = pts;
+      } else {
+        console.log("Control Point data is improperly formatted: " + text);
+      }
+
+    } catch (e) {
+      console.log("Error parsing control points from JSON: " + text);
+    }
+  }
+
+  pasteControlPoints() {
+    navigator
+      .clipboard
+      .readText()
+      .then(text => this.parseControlPtsJSON(text));
+  }
+
+  async onControlPtsUpload(files: FileList | null) {
+    const fileContent = await files?.item(0)?.text();
+    if (fileContent) {
+      this.parseControlPtsJSON(fileContent)
+    }
+  }
+
+  handleChannelChange() {
+    this.customCurvePoints = this.selectedChannel
+      .customTargetCurvePoints
+      .map(item => {
+        const [freq, gain] = item.substring(1, item.length - 1).split(', ');
+        return { freq: Number(freq), gain: Number(gain) };
+      }) || [];
+    this.updateChart();
   }
 
   processDataWithWorker(json: AudysseyInterface) {
@@ -104,8 +188,8 @@ export class AppComponent {
         console.log('Got a message from Web-Worker');
         this.calculatedChannelsData = data;
 
-        this.selectedChannel = json.detectedChannels[0];
-        this.updateChart();
+        this.selectedChannel = json.detectedChannels[0] ?? this.houseCurveChannel;
+        this.handleChannelChange();
         this.chartObj?.hideLoading();
       };
     } else {
@@ -120,10 +204,6 @@ export class AppComponent {
 
     const XMin = 10, XMax = 24000;
 
-    this.chartOptions.title = {
-      text: decodeChannelName(this.selectedChannel?.commandId)
-    };
-
     // add frequency Rolloff
     const xAxisBands = [{
       from: this.selectedChannel?.frequencyRangeRolloff,
@@ -136,7 +216,7 @@ export class AppComponent {
     }];
 
     // add Crossover if it's a logarithmic scale
-    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale) {
+    if (this.selectedChannel.customCrossover && this.chartLogarithmicScale) {
       xAxisBands.push({
         from: XMin,
         to: decodeCrossover(this.selectedChannel.customCrossover),
@@ -156,13 +236,13 @@ export class AppComponent {
     };
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
-    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
+    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel.commandId) ?? [];
 
     // adding first graph
     this.chartOptions.series![0] = {
       data: selectedChannelData ?? [],
       type: this.graphSmoothEnabled ? 'spline' : 'line',
-      name: decodeChannelName(this.selectedChannel?.commandId),
+      name: decodeChannelName(this.selectedChannel.commandId),
     };
 
     this.updateTargetCurve();
@@ -193,6 +273,42 @@ export class AppComponent {
       }
 
     this.chartUpdateFlag = true;
+  }
+
+  sliderValToRolloffVal(sliderVal: number): number {
+    // range of slider's domain
+    const SLIDER_MIN = 1;
+    const SLIDER_MAX = 1000;
+    const pct = (sliderVal - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN);
+
+    // Get actual min/max values for x axis
+    // (note, for log axis it's the log of the real value)
+    const min = this.chartObj!.xAxis[0].min!;
+    const max = this.chartObj!.xAxis[0].max!;
+
+    let rolloff = pct * (max - min) + min;
+    if (this.chartLogarithmicScale) {
+      rolloff = Math.pow(10, rolloff);
+    }
+
+    return Math.round(rolloff);
+  }
+
+  rolloffUpdatePending = false;
+  updateRolloff(evt: Event) {
+    if (this.rolloffUpdatePending) {
+      return;
+    }
+
+    this.selectedChannel.frequencyRangeRolloff = this.sliderValToRolloffVal(Number((evt.target as HTMLInputElement).value));
+    window.setTimeout(() => {
+      this.updateChart();
+      this.rolloffUpdatePending = false;
+    }, 50);
+  }
+
+  formatRolloffValue(value: number): string {
+    return `${this.sliderValToRolloffVal(value).toLocaleString("en-US", {useGrouping: true})} Hz`;
   }
 
   updateTargetCurve() {
@@ -229,15 +345,15 @@ export class AppComponent {
       ? ROLLOFF_2_TARGET_CURVE
       : ROLLOFF_1_TARGET_CURVE;
 
-    if (this.selectedChannel?.midrangeCompensation) {
+    if (this.selectedChannel.midrangeCompensation) {
       targetCurve = targetCurve.concat(MIDRANGE_COMPENSATION_CONTROL_POINTS);
     }
 
     const targetPoints = convertToNonDraggablePoints(targetCurve);
     let data = targetPoints;
-    if (this.selectedChannel?.customTargetCurvePoints) {
+    if (this.selectedChannel.customTargetCurvePoints) {
       // if there are custom target curve points, they should override any built-in target curve points
-      const customPoints = convertToDraggablePoints(this.selectedChannel?.customTargetCurvePoints);
+      const customPoints = convertToDraggablePoints(this.selectedChannel.customTargetCurvePoints);
       const customFreqs = new Set(customPoints.map(e => e.x));
       data = [
         ...targetPoints.filter(pt => !customFreqs.has(pt.x)),
@@ -246,7 +362,6 @@ export class AppComponent {
     }
 
     data = data.sort((a, b) => a.x! - b.x!);
-
     console.log('data', data);
 
     if (this.audysseyData.enTargetCurveType) {
@@ -270,15 +385,22 @@ export class AppComponent {
     URL.revokeObjectURL(url);
   }
 
-  playChart(ev?: Event | Highcharts.Dictionary<any> | undefined) {
-    console.log('playChart', ev)
-    // this.chartObj?.toggleSonify();
-  }
-
   async loadExample() {
     this.chartObj?.showLoading();
     const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
     this.audysseyData = example;
     this.processDataWithWorker(example);
+  }
+
+  constructor() {
+    this.loadExample();
+  }
+
+  applySpeedOfSoundFix() {
+    this.audysseyData.detectedChannels.forEach(channel => {
+      channel.channelReport.distance *= SPEED_SOUND_FIX_FACTOR;
+    });
+
+    this.speedSoundFixApplied = true;
   }
 }

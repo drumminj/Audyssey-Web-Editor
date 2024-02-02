@@ -1,5 +1,20 @@
 export const options: Highcharts.Options = {
+  // Avoid the chart scaling down to an unreasonable height for a fixed
+  // aspect ratio
+  responsive: {
+    rules: [{
+      chartOptions: {
+        chart: {
+          height: 280
+        }
+      },
+      condition: {
+        maxWidth: 500
+      }
+    }]
+  },
   chart: {
+    height: (9 / 16 * 100) + '%', // 16:9 ratio
     zooming: {
       type: 'x',
       // key: 'ctrl',
@@ -36,26 +51,16 @@ export const options: Highcharts.Options = {
   exporting: {
     sourceWidth: 1920,
     menuItemDefinitions: {
-      // Custom definition
-      // play: {
-      //   onclick: function () {
-      //     this.toggleSonify()
-      //   },
-      //   text: 'Play'
-      // },
       xScale: {
-        text: 'Toggle Logarithmic/Linear scale'
-      },
-      dataSmoothing: {
-        text: 'Data Smoothing'
+        text: '&nbsp;&nbsp; Toggle linear/log scale'
       },
       graphSmoothing: {
-        text: 'Graph Smoothing'
+        text: '&nbsp;&nbsp; Graph smoothing'
       }
     },
     buttons: {
       contextButton: {
-        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'play', 'xScale', 'graphSmoothing']
+        menuItems: ['xScale', 'graphSmoothing']
       },
     },
     chartOptions: {
@@ -70,31 +75,9 @@ export const options: Highcharts.Options = {
       }
     }
   },
-  sonification: {
-    duration: 9500,
-    defaultInstrumentOptions: {
-      instrument: 'sine',
-
-      mapping: {
-        volume: 'y',
-        noteDuration: {
-          mapTo: '-x',
-          mapFunction: 'logarithmic',
-        },
-        frequency: {
-          mapTo: 'x',
-          min: 0,
-          max: 23000
-        },
-      }
-    },
-  },
   accessibility: { enabled: false },
   title: {
-    text: 'Measurements graph'
-  },
-  subtitle: {
-    text: 'First measurement'
+    text: '_'
   },
   tooltip: {
     headerFormat: '<b>{point.x:,.0f}</b> Hz<br/>',
@@ -175,7 +158,19 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
     },
     zones: [
       {
+        value: -30,
+        color: '#ff0000'
+      },
+      {
+        value: -15,
+        color: '#ff0000'
+      },
+      {
         value: -10,
+        color: '#c93737'
+      },
+      {
+        value: -5,
         color: '#f79d5c'
       },
       {
@@ -184,16 +179,31 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
       },
       {
         value: 10,
-        color: '#d98f52'
+        color: '#f79d5c'
       },
       {
-        value: 20,
-        color: '#ff0000'
-      },
-      {
+        value: 15,
         color: '#c93737'
       },
+      {
+        color: '#ff0000'
+      },
     ],
+    color: {
+      linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+      stops: [
+        [0, '#c93737'],     // 25dB
+        [0.11, '#c93737'],   // 20dB
+        [0.22, '#ff0000'],   // 15dB
+        [0.33, '#f79d5c'],   // 10dB
+        [0.44, '#719f20'],  // 3.5dB
+        [0.55, '#719f20'],   // 0dB
+        [0.66, '#719f20'],  // -3.5dB 
+        [0.77, '#f79d5c'],   // -10dB
+        [0.88, '#ff0000'],   // -15dB
+        [1.0, '#c93737'],   // -20dB
+      ]
+    }
   },
   {
     name: 'Subwoofer',

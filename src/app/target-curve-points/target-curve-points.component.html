@@ -1,25 +1,21 @@
 <form #pointsForm="ngForm" class="container">
-  <div *ngFor="let point of (curvePoints | convertPoints); let i = index" class="point-row">
-    <mat-form-field appearance="outline" style="margin-right: 12px">
-      <mat-label>Hz</mat-label>
-      <input matInput [(ngModel)]="point.Hz" (change)="changeItem(point, i)" required inputmode="decimal" pattern="[1-9][0-9]*[.]?[0-9]+" maxlength="18" minlength="2" [name]="'Frequency' + i">
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Gain</mat-label>
-      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" required inputmode="decimal" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="20" [name]="'Gain' + i">
-    </mat-form-field>
-
-    <button class="remove-btn" matRipple (click)="removePoint(i)">
-      <svg xmlns="http://www.w3.org/2000/svg" height="55" viewBox="0 96 960 960" width="48"><path d="m361 757 119-121 120 121 47-48-119-121 119-121-47-48-120 121-119-121-48 48 120 121-120 121 48 48ZM261 936q-24 0-42-18t-18-42V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306Zm-438 0v570-570Z"/></svg>
-    </button>
+  <div class="points-container">
+    <div *ngFor="let point of (curvePoints); let i = index" class="point-row">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" style="flex: 1 1 auto">
+        <mat-label>Freq (Hz)</mat-label>
+        <input matInput [ngModel]=point.freq (change)="changeFreq($event, i)" required inputmode="decimal" pattern="[1-9][0-9]*([.][0-9]+)?" size=8 minlength=2 [name]="'Frequency' + i">
+      </mat-form-field>
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" style="flex: 1 1 auto">
+        <mat-label>Gain (dB)</mat-label>
+        <input matInput [ngModel]=point.gain (change)="changeGain($event, i)" required inputmode="decimal" pattern="(\d|(1[0-2]))([.][0-9]+)?" size=8 minLength=1 [name]="'Gain' + i">
+      </mat-form-field>
+      <button mat-button color="accent" aria-label="Remove control point" matTooltip="Remove control point" class="icon-only-btn" (click)="removePoint(i)">
+        <mat-icon>delete_forever</mat-icon>
+      </button>
+    </div>
   </div>
-
-  <div style="display: flex; justify-items: stretch; gap: 12px">
-    <button matRipple type="button" style="flex-grow: 1; transition-property: width" class="flat-btn" (click)="addPoint()">Add new Point</button>
-    <button matRipple type="submit" *ngIf="wasChanged" class="flat-btn" (click)="save()" [disabled]="pointsForm.invalid">Save</button>
-  </div>
-  <div style="display: flex; margin-top: 6px">
-    <button matRipple class="flat-btn" style="border: none" (click)="copyPoints()">Copy</button>
-    <button matRipple class="flat-btn" style="border: none" (click)="pastePoints()">Paste</button>
-  </div>
+  <button mat-button color="accent" aria-label="Add new control point" style="margin-top: 8px" (click)="addPoint()">
+    <mat-icon>add_circle_outline</mat-icon>
+    Add New
+  </button>
 </form>
