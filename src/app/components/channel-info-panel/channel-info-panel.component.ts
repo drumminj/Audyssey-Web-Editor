@@ -67,7 +67,15 @@ export class ChannelInfoPanelComponent {
       const newDistance = this.distanceUnit === DistanceUnit.Meters
         ? distance
         : distance / METERS_TO_FEET_FACTOR;
-      this.channelData[index].customDistance = newDistance;
+
+      // Save off custom distance. Note that Audyssey uses a separate field
+      // if this is customized, so if for some reason the user sets the value
+      // back to the original/detected distance, just remove the custom value
+      if (newDistance === this.channelData[index].channelReport.distance) {
+        this.channelData[index].customDistance = undefined;
+      } else {
+        this.channelData[index].customDistance = newDistance;
+      }
       this.channelDataChange.emit(this.channelData)
     }
 
