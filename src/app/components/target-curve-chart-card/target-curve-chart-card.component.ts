@@ -31,7 +31,7 @@ export class TargetCurveChartCardComponent {
   @Input({required: true})
   get channelData() { return this._channelData }
   set channelData(value: number[][]) {
-    this.drawer.close();
+    this.drawer?.close();
     this._channelData = value;
     this.updateChart();
   }
@@ -126,7 +126,10 @@ export class TargetCurveChartCardComponent {
     this.updateChartMenuItems();
 
     // immediately redraw with data for selected channel once chart is initialized
-    window.setTimeout(() => this.updateChart(), 0);
+    window.setTimeout(() => {
+      this.updateRolloffSlider();
+      this.updateChart()
+    }, 0);
   }
 
   // Updates context menu items for the chart based on the option's current state
@@ -226,6 +229,10 @@ export class TargetCurveChartCardComponent {
   }
 
   private updateRolloffSlider() {
+    if (!this.chartObj) {
+      return;
+    }
+
     // update the slider position based on correction frequency
     const min = this.chartObj!.xAxis[0].min!;
     const max = this.chartObj!.xAxis[0].max!;

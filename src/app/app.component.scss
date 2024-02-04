@@ -64,6 +64,22 @@ $layout-gap: 20px;
   }
 }
 
+.load-overlay {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  bottom: 0;
+  display: none;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+main.loading .load-overlay {
+  display: block;
+}
+
 .header {
   display: flex;
   flex-wrap: wrap;
@@ -110,6 +126,7 @@ main {
   display: flex;
   gap: $layout-gap;
   margin-top: $layout-gap;
+  position: relative;
 
   @media (max-width: 500px) {
     flex-direction: column;
@@ -130,6 +147,7 @@ main {
   gap: 10px;
   max-width: 300px;
   min-width: 240px;
+  position: relative;
 
   .profile-container {
     align-items: stretch;
@@ -156,4 +174,5 @@ main {
 .right-panel {
   flex: 1 1 0;
   overflow: hidden;
+  position: relative;
 }

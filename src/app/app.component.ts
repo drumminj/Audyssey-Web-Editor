@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AudysseyInterface } from 'interfaces/audyssey-interface';
+
+const LOADING_CLASS = "loading";
 
 @Component({
   selector: 'app-root',
@@ -7,26 +9,29 @@ import { AudysseyInterface } from 'interfaces/audyssey-interface';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  @ViewChild('main') main!: ElementRef;
   audysseyData: AudysseyInterface = { detectedChannels: [], enTargetCurveType: 1 };
-
+  
   constructor() {
     // Load example by default so new users aren't faced with a blank screen 
     this.loadExample();
   }
 
   async loadExample() {
-    // TODO: show loading
+    this.main?.nativeElement.classList.add(LOADING_CLASS);
     const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
     this.audysseyData = example;
+    this.main?.nativeElement.classList.remove(LOADING_CLASS);
   }
 
   async onProfileUpload(files: FileList | null) {
-    // TODO: show loading
+    this.main?.nativeElement.classList.add(LOADING_CLASS);
     const fileContent = await files?.item(0)?.text();
     if (fileContent) {
       this.audysseyData = JSON.parse(fileContent);
     }
     else alert('Cannot read the file');
+    this.main?.nativeElement.classList.remove(LOADING_CLASS);
   }
 
   exportFile() {

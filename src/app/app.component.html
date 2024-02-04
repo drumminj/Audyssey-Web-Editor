@@ -22,8 +22,9 @@
         </a>
     </mat-card-content>
 </mat-card>
-<main>
+<main #main class="loading">
     <div class="left-panel">
+        <div class="load-overlay"></div>
         <mat-card>
             <mat-card-header>
                 <mat-card-title>Profile</mat-card-title>
@@ -64,6 +65,7 @@
         </mat-card>
     </div>
     <div class="right-panel">
+        <div class="load-overlay"></div>
         <mat-accordion class="info-panels">
             <mat-expansion-panel #channelPanel (closed)="targetCurvePanel.expanded = true" expanded>
                 <mat-expansion-panel-header>
