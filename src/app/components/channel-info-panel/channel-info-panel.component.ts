@@ -9,6 +9,12 @@ const enum DistanceUnit {
     Feet = "ft"
 }
 
+const METERS_STEP =  0.01;
+const FEET_STEP = 0.1;
+
+const METERS_FORMAT = '1.2-2';
+const FEET_FORMAT = '1.1-1';
+
 @Component({
     selector: 'channel-info-panel',
     templateUrl: './channel-info-panel.component.html',
@@ -27,6 +33,8 @@ export class ChannelInfoPanelComponent {
     channelDataChange = new EventEmitter<DetectedChannel[]>();
 
     distanceUnit = DistanceUnit.Meters;
+    distanceStep = METERS_STEP;
+    distanceFormat = METERS_FORMAT;
 
     // speaker distance values converted to the appropriate unit for display,
     // based on this.distanceUnit
@@ -47,23 +55,26 @@ export class ChannelInfoPanelComponent {
       ];
 
     private mapDistanceValues(): number[] {
-      return this.channelData.map(channel => (
-        this.distanceUnit === DistanceUnit.Meters
-          ? channel.channelReport.distance
-          : channel.channelReport.distance * METERS_TO_FEET_FACTOR
-      ));
+      return this.channelData.map(channel => {
+        const distance = channel.customDistance ?? channel.channelReport.distance;
+        return this.distanceUnit === DistanceUnit.Meters
+          ? distance
+          : distance * METERS_TO_FEET_FACTOR
+      });
     }
 
     handleDistanceChange(distance: number, index: number): void {
       const newDistance = this.distanceUnit === DistanceUnit.Meters
         ? distance
         : distance / METERS_TO_FEET_FACTOR;
-      this.channelData[index].channelReport.distance = newDistance;
+      this.channelData[index].customDistance = newDistance;
       this.channelDataChange.emit(this.channelData)
     }
 
     setDistanceUnit(unit: DistanceUnit): void {
       this.distanceUnit = unit;
+      this.distanceStep = (unit == DistanceUnit.Meters) ? METERS_STEP : FEET_STEP;
+      this.distanceFormat = (unit == DistanceUnit.Meters) ? METERS_FORMAT : FEET_FORMAT;
       this.distanceValues = this.mapDistanceValues();
     }
 

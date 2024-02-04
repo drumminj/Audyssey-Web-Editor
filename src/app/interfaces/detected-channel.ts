@@ -3,7 +3,7 @@ export interface DetectedChannel {
   enChannelType: number
   isSkipMeasurement: boolean
   frequencyRangeRolloff: number
-  customDistance: number
+  customDistance?: number
   customTargetCurvePoints: string[]
   commandId: string
   customSpeakerType?: string
