@@ -1,0 +1,60 @@
+<div class="target-curve-content">
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Channel</mat-label>
+        <mat-select [ngModel]="selectedChannel" (ngModelChange)="setSelectedChannel($event)">
+            <mat-option [value]="HOUSE_CURVE_CHANNEL" class="house-curve-option"> - House Curve - </mat-option>
+            <mat-option *ngFor="let channel of channelData; let i = index" [value]=i>{{ channel.commandId | decodeChannelName }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-card class="house-curve-card" *ngIf="selectedChannel===HOUSE_CURVE_CHANNEL">
+        <mat-card-content>
+            <div>
+                A house curve will apply a common target to all channels (including the subwoofer channel),
+                overriding any existing custom target points.  The curve itself won't be saved with the ADY file
+                and will need to be re-created each time the file is loaded.
+                <br><br>
+                Midrange compensation and rolloff frequency can still be configured on a per-channel basis.
+            </div>
+            <mat-slide-toggle [(ngModel)]="useHouseCurve" color="accent" style="margin-top: 16px">Use House Curve</mat-slide-toggle>
+        </mat-card-content>
+    </mat-card>
+    <target-curve-chart-card
+        [channelData]="this.selectedChannelResponseData"
+        [targetCurve]="this.targetCurve"
+        [midrangeCompensation]="selectedChannelData.midrangeCompensation"
+        [crossoverFreq]="selectedChannelData.customCrossover | decodeCrossover"
+
+        [canSetCorrectionFreqLimit]="selectedChannel != HOUSE_CURVE_CHANNEL"
+        [correctionLimit]="selectedChannelData.frequencyRangeRolloff"
+        (correctionLimitChange)="handleCorrectionLimitChange($event)"
+
+        [canEditControlPoints]="!useHouseCurve || selectedChannel === HOUSE_CURVE_CHANNEL"
+        [controlPoints]="selectedChannelControlPts"
+        (controlPointsChange)="handleControlPointsChange($event)"
+    />
+    <div style="display: flex; justify-content: flex-end;">
+        <mat-slide-toggle
+            *ngIf="selectedChannelData"
+            color="accent"
+            labelPosition="before"
+            [(ngModel)]="selectedChannelData.midrangeCompensation"
+            [disabled]="selectedChannel === HOUSE_CURVE_CHANNEL"
+        >
+            Midrange Compensation
+        </mat-slide-toggle>
+    </div>
+    <mat-card class="auto-leveling-card">
+        <mat-card-header>
+            <mat-icon color="warn">warning</mat-icon>Auto Leveling Warning
+        </mat-card-header>
+        <mat-card-content>
+            <div>
+                In order to keep levels matched across channels Audyssey automatically shifts any target curve
+                up or down based on the curve's gain at certain frequencies (between 50 - 80Hz for subwoofers;
+                100Hz for all other channels).  To account for this, manually adjust the gain for affected
+                channels by the amount of gain in the target curve at these frequencies.
+                <a href="">More info...</a>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

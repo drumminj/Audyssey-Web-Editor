@@ -15,7 +15,7 @@
         <div class="options-container">
             <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" >
                 <mat-label>Target Sound</mat-label>
-                <mat-select [ngModel]="audysseyData.enTargetCurveType" (ngModelChange)="setTargetCurve($event)">
+                <mat-select [ngModel]="audysseyData.enTargetCurveType" (ngModelChange)="setTargetCurve($event)" [disabled]="!audysseyData.detectedChannels.length">
                     <mat-option [value]="1">HF Rolloff 1</mat-option>
                     <mat-option [value]="2">HF Rolloff 2</mat-option>
                 </mat-select>

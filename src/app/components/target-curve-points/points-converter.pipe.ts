@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ControlPoint } from '../interfaces/control-point';
+import { ControlPoint } from '../../interfaces/control-point';
 
 @Pipe({ name: 'convertPoints' })
 export class PointsConverterPipe implements PipeTransform {

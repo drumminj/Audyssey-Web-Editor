@@ -1,7 +1,9 @@
+$layout-gap: 20px;
+
 :host {
-  color: #123;
+  color: #333;
   display: block;
-  padding: 10px;
+  padding: $layout-gap;
 
   @media (max-width: 500px) {
     padding: 0
@@ -54,6 +56,12 @@
       }
     }
   }
+
+  ::ng-deep mat-card-header {
+    margin-bottom: 15px;
+    margin-top: -4px;
+    font-weight: bold;
+  }
 }
 
 .header {
@@ -63,6 +71,10 @@
   column-gap: 24px;
   row-gap: 10px;
   padding: 24px;
+
+  a {
+    color: #333;
+  }
 
   h1 {
     margin: 0;
@@ -94,21 +106,13 @@
 }
 
 main {
-  display: flex;
   align-items: flex-start;
+  display: flex;
+  gap: $layout-gap;
+  margin-top: $layout-gap;
 
   @media (max-width: 500px) {
     flex-direction: column;
-  }
-}
-
-mat-card, system-info-card {
-  margin: 10px;
-
-  ::ng-deep mat-card-header {
-    margin-top: -4px;
-    margin-bottom: 15px;
-    font-weight: bold;
   }
 }
 
@@ -119,14 +123,29 @@ mat-card, system-info-card {
   }
 }
 
-//
-
 .left-panel {
+  display: flex;
   flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
   max-width: 300px;
   min-width: 240px;
-  overflow: hidden;
 
+  .profile-container {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  
+    .profile-input {
+      flex: 1 1 auto;
+      input  {
+        font-weight: bold;
+        text-align: center;
+      }
+    } 
+  }
+  
   .export-card {
     align-items: stretch;
     display: flex;
@@ -134,177 +153,7 @@ mat-card, system-info-card {
   }
 }
 
-.profile-container {
-  align-items: stretch;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  .profile-input {
-    flex: 1 1 auto;
-    input  {
-      font-weight: bold;
-      text-align: center;
-    }
-  } 
-}
-
 .right-panel {
   flex: 1 1 0;
   overflow: hidden;
-}
-
-.channel-container {
-  align-content: center;
-  column-gap: 6px;
-  grid-template-columns: minmax(min-content, 0.7fr) repeat(4, 1fr);
-  display: grid;
-  margin-top: 6px;
-  row-gap: 12px;
-
-  .speaker-name {
-    align-items: center;
-    justify-content: flex-end;
-    color: #999;
-    display: flex;
-    font-weight: 500;
-    margin: 2px 10px 0 0;
-    padding: 0;
-    text-align: right;
-  }
-}
-
-.speed-sound-card, .auto-leveling-card {
-  background-color: #eee;
-  margin: 20px 0 0 0;
-
-  mat-card-header {
-    align-items: center;
-    display: flex;
-
-    mat-icon {
-      margin-right: 6px;
-    }
-  }
-  mat-card-content {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
-.speed-sound-btn {
-  margin-top: 12px;
-}
-
-.house-curve-option:after {
-  border-bottom: solid 1px #ccc;
-  content: '';
-  left: 16px;
-  position: absolute;
-  right: 16px;
-  bottom: 0;
-  z-index: 1;
-}
-
-.target-curve-content {
-  align-items: stretch;
-  display: flex;
-  flex-direction: column;
-
-  > mat-card {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .control-points-drawer {
-    background-color: #333;
-    border-bottom-left-radius: 4px;
-    border-top-left-radius: 4px;
-    color: white;
-
-    ::ng-deep .mat-drawer-inner-container {
-      align-items: stretch;
-      display: flex;
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      overflow: hidden;
-      padding: 12px;
-    }
-
-    .title {
-      display: flex;
-      justify-content: space-between;
-      font-weight: bold;
-
-      button.close-btn {
-        background-color: transparent;
-        color: #ccc;
-        padding: 2px;
-
-        &:hover {
-          color: #fff;
-        }
-      }
-    }
-
-    .toolbar {
-      align-items: center;
-      background-color: #555;
-      border-radius: 4px;
-      display: flex;
-      justify-content: flex-end;
-
-      > button {
-        border-radius: 0;
-        border-right: 1px solid #777;
-        color: #ccc;
-
-        &:hover {
-          color: #fff;
-        }
-
-        &:last-child {
-          border: none;
-        }
-      }
-    }
-  }
-
-  .load-control-pts-btn {
-    margin-top: 4px;
-    padding: 6px 12px;
-  }
-}
-
-.house-curve-card {
-  background-color: #eee;
-}
-
-.edit-control-pts {
-  opacity: 85%;
-  position: absolute;
-  right: 22px;
-  bottom: 78px;
-  z-index: 1;
-}
-
-.comp-limit-slider {
-  bottom: 40px;
-  left: 60px;
-  opacity: 65%;
-  position: absolute;
-  right: 4px;
-  z-index: 1;
-
-  &:hover {
-    opacity: 100%;
-  }
-
-  ::ng-deep span.mdc-slider__value-indicator-text {
-    white-space: nowrap;
-  }
 }

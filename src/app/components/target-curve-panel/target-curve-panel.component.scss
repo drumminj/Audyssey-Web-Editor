@@ -1,0 +1,38 @@
+.auto-leveling-card {
+  background-color: #eee;
+  margin-top: 10px;
+
+  mat-card-header {
+    align-items: center;
+    display: flex;
+
+    mat-icon {
+    margin-right: 6px;
+    }
+  }
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.house-curve-option:after {
+  border-bottom: solid 1px #ccc;
+  content: '';
+  left: 16px;
+  position: absolute;
+  right: 16px;
+  bottom: 0;
+  z-index: 1;
+}
+
+.target-curve-content {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.house-curve-card {
+  background-color: #eee;
+}

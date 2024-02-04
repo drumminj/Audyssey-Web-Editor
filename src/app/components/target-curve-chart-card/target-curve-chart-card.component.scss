@@ -1,0 +1,64 @@
+.edit-control-pts {
+  opacity: 85%;
+  position: absolute;
+  right: 22px;
+  bottom: 78px;
+  z-index: 1;
+
+  &:hover {
+    opacity: 100%;
+  }
+}
+
+.control-points-drawer {
+  background-color: #333;
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  color: white;
+
+  ::ng-deep .mat-drawer-inner-container {
+    align-items: stretch;
+    display: flex;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+    padding: 12px;
+  }
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+
+    button.close-btn {
+      background-color: transparent;
+      color: #ccc;
+      padding: 2px;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+}
+
+.comp-limit-slider {
+  bottom: 40px;
+  left: 60px;
+  opacity: 65%;
+  position: absolute;
+  right: 4px;
+  z-index: 1;
+
+  &:hover {
+    opacity: 100%;
+  }
+
+  ::ng-deep span.mdc-slider__value-indicator-text {
+    white-space: nowrap;
+  }
+}

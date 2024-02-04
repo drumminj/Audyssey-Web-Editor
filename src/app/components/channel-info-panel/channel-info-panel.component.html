@@ -1,0 +1,63 @@
+<div class="distance-unit-container">
+    <label for="distanceUnits">Distance Unit:</label>
+    <mat-button-toggle-group [ngModel]=distanceUnit name="distanceUnits" aria-label="Distance Units" (ngModelChange)="setDistanceUnit($event)">
+        <mat-button-toggle value="m" matTooltip="meters">m</mat-button-toggle>
+        <mat-button-toggle value="ft" matTooltip="feet">ft</mat-button-toggle>
+    </mat-button-toggle-group>
+</div>
+<div class="channel-container">
+    <ng-container *ngFor="let channel of channelData; let i=index">
+        <div class="speaker-name">
+            {{ channel.commandId | decodeChannelName }}
+        </div>
+        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+            <mat-label>Speaker Config</mat-label>
+            <mat-select [(ngModel)]="channel.customSpeakerType" [disabled]="channel.commandId.startsWith('SW')" (change)="channelDataChange.emit(channelData)">
+                <mat-option [value]="undefined"></mat-option>
+                <mat-option [value]="'S'">Small</mat-option>
+                <mat-option [value]="'L'">Large</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field
+            appearance="outline"
+            floatLabel="always"
+            subscriptSizing="dynamic"
+            matTooltip="Crossover values can only be set for speakers configured as 'Small'"
+            [matTooltipDisabled]="channel.customSpeakerType == 'S'"
+        >
+            <mat-label>Crossover</mat-label>
+            <mat-select [(ngModel)]="channel.customCrossover" [disabled]="channel.customSpeakerType != 'S'" (ngModelChange)="channelDataChange.emit(channelData)">
+                <mat-option [value]="undefined"></mat-option>
+                <mat-option *ngFor="let freq of crossoverFreqs" value={{freq.val}}>{{freq.label}} Hz</mat-option>
+                <mat-option [value]="'F'">Full Band</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+            <mat-label>{{ "Distance (" + distanceUnit + ")" }}</mat-label>
+            <input matInput [ngModel]="distanceValues[i] | number: '1.2-2'" type="number" step="0.01" (ngModelChange)="handleDistanceChange($event, i)">
+        </mat-form-field>
+        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+            <mat-label>Level</mat-label>
+            <input matInput [(ngModel)]="channel.customLevel" type="number" step="0.5" min="-12" max="12" (ngModelChange)="channelDataChange.emit(channelData)">
+        </mat-form-field>
+    </ng-container>
+</div>
+<mat-card class="speed-sound-card">
+    <mat-card-header>
+        <mat-icon color="accent">info</mat-icon>Speed-of-Sound Distance Fix
+    </mat-card-header>
+    <mat-card-content>
+        <div>
+            Denon and Marantz AVR models prior to the 2022 model year use an approximation for the speed of sound
+            to simplify speaker distance and delay calculations.  As a result, speaker delays are set incorrectly.
+            This can be accounted for by scaling all detected distances by 87.5% (multiply by 0.875).  Clicking the
+            button below will scale all distance values to correct this issue.
+            <a target="_blank" href="https://www.avsforum.com/threads/audyssey-time-alignment-is-off-according-to-rew-impluse-readings.3243684/">
+                More info...
+            </a>
+        </div>
+        <button mat-flat-button color="accent" class="speed-sound-btn" (click)="applySpeedOfSoundFix()" [disabled]="speedSoundFixApplied">
+            {{speedSoundFixApplied ? "Fix Applied" : "Apply Fix" }}
+        </button>
+    </mat-card-content>
+</mat-card>

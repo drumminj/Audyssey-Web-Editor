@@ -87,8 +87,8 @@ export const options: Highcharts.Options = {
     // shared: true,
   },
   xAxis: {
-    min: 20,
-    max: 20000,
+    min: 10,
+    max: 24000,
     type: 'logarithmic',
     title: { text: 'Frequency (Hz)' },
     crosshair: true,
@@ -189,21 +189,6 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
         color: '#ff0000'
       },
     ],
-    color: {
-      linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-      stops: [
-        [0, '#c93737'],     // 25dB
-        [0.11, '#c93737'],   // 20dB
-        [0.22, '#ff0000'],   // 15dB
-        [0.33, '#f79d5c'],   // 10dB
-        [0.44, '#719f20'],  // 3.5dB
-        [0.55, '#719f20'],   // 0dB
-        [0.66, '#719f20'],  // -3.5dB 
-        [0.77, '#f79d5c'],   // -10dB
-        [0.88, '#ff0000'],   // -15dB
-        [1.0, '#c93737'],   // -20dB
-      ]
-    }
   },
   {
     name: 'Subwoofer',

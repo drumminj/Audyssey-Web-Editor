@@ -1,9 +1,10 @@
 import {DetectedChannel} from "./detected-channel";
+import { TargetCurve } from "./target-curve";
 
 export interface AudysseyInterface {
   enAmpAssignType?: number
   dynamicVolume?: boolean
-  enTargetCurveType?: number
+  enTargetCurveType: TargetCurve
   lfcSupport?: boolean
   detectedChannels: DetectedChannel[]
   targetModelName?: string

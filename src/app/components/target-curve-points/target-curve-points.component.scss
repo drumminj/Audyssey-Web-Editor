@@ -1,9 +1,15 @@
-.container {
+:host {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  padding: 8px 0;
+}
+
+.container {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  margin: 8px 0;
+  overflow-y: scroll;
 }
 
 .points-container {
@@ -17,9 +23,6 @@
     --mdc-outlined-text-field-label-text-color: #ccc;
     --mdc-outlined-text-field-hover-outline-color: #fff;
 
-    &:hover {
-      --mdc-outlined-text-field-outline-color: red;
-    }
     ::ng-deep .mat-mdc-form-field-infix {
       min-height: unset !important;
       padding: 8px 0 !important;
@@ -50,5 +53,30 @@
   100% {
     opacity: 1;
     transform: none;
+  }
+}
+
+.add-btn {
+  margin-top: 8px;
+}
+
+.toolbar {
+  align-items: center;
+  background-color: #555;
+  border-radius: 4px;
+  display: flex;
+
+  > button {
+    border-radius: 0;
+    border-right: 1px solid #777;
+    color: #ccc;
+
+    &:hover {
+      color: #fff;
+    }
+
+    &:last-child {
+      border: none;
+    }
   }
 }

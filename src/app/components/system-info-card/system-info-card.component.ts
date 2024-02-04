@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import  { AudysseyInterface } from "../../interfaces/audyssey-interface";
+import  { AudysseyInterface } from "interfaces/audyssey-interface";
+import { TargetCurve } from "interfaces/target-curve";
 
-type TargetCurveOptions = 1|2;
 @Component({
     selector: 'system-info-card',
     templateUrl: './system-info-card.component.html',
@@ -12,7 +12,7 @@ export class SystemInfoCardComponent {
     audysseyData!: AudysseyInterface;
   
     @Output()
-    targetCuveChange = new EventEmitter<TargetCurveOptions>();
+    targetCuveChange = new EventEmitter<TargetCurve>();
 
     @Output()
     dynamicEQChange = new EventEmitter<boolean>();
@@ -28,7 +28,7 @@ export class SystemInfoCardComponent {
         this.dynamicVolumeChange.emit(val);
     }
 
-    setTargetCurve(val: TargetCurveOptions): void {
+    setTargetCurve(val: TargetCurve): void {
         this.targetCuveChange.emit(val);
     }
 }

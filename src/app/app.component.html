@@ -13,12 +13,12 @@
             <circle cx="120.1" cy="120.1" r="120.1" fill="url(#a)" fill-rule="evenodd" clip-rule="evenodd"/>
             <path fill="#FFF" fill-rule="evenodd" d="M54.3 118.8c35-15.2 58.3-25.3 70-30.2 33.3-13.9 40.3-16.3 44.8-16.4 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3s.4 3.1.2 4.7c-1.8 19-9.6 65.1-13.6 86.3-1.7 9-5 12-8.2 12.3-7 .6-12.3-4.6-19-9-10.6-6.9-16.5-11.2-26.8-18-11.9-7.8-4.2-12.1 2.6-19.1 1.8-1.8 32.5-29.8 33.1-32.3.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1.1.2-17.9 11.4-50.6 33.5a22.5 22.5 0 0 1-13 4.8 86.6 86.6 0 0 1-18.7-4.4c-7.5-2.4-13.5-3.7-13-7.9.3-2.2 3.3-4.4 8.9-6.7z" clip-rule="evenodd"/>
           </svg>
-          <span style="color:#323842">Contact</span>
+          <span>Contact</span>
         </a>
 
         <a href='https://ko-fi.com/vladi_ed' class="icon-link" target='_blank'>
           <img src='https://storage.ko-fi.com/cdn/cup-border.png' alt='Buy Me a Coffee' />
-          <span style="color:#323842">Donate</span>
+          <span>Donate</span>
         </a>
     </mat-card-content>
 </mat-card>
@@ -43,7 +43,7 @@
                             type="file"
                             accept=".ady"
                             onclick="this.value=null"
-                            (change)="drawer.close(); onProfileUpload(profileFileInput.files)"
+                            (change)="onProfileUpload(profileFileInput.files)"
                             hidden
                         />
                       </button>
@@ -54,7 +54,7 @@
             [audysseyData]="audysseyData"
             (dynamicEQChange)="audysseyData.dynamicEq=$event"
             (dynamicVolumeChange)="audysseyData.dynamicVolume=$event"
-            (targetCuveChange)="audysseyData.enTargetCurveType=$event; updateChart()"
+            (targetCuveChange)="audysseyData.enTargetCurveType=$event"
             />
         <mat-card>
             <button mat-flat-button color="primary" (click)="exportFile()" matTooltip="Export and download current settings as ADY file">
@@ -64,203 +64,28 @@
         </mat-card>
     </div>
     <div class="right-panel">
-        <!-- This card shouldn't be needed - just using it for margins really -->
-        <mat-card style="background-color: transparent; border: none">
-            <mat-accordion class="info-panels">
-                <mat-expansion-panel #channelPanel (closed)="targetCurvePanel.expanded = true" expanded>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title style="white-space: nowrap">
-                            Channel Info
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; margin-top: -6px">
-                        <label for="distanceUnits" style="margin-right: 12px; color: #999">Distance Unit:</label>
-                        <mat-button-toggle-group [(value)]=distanceUnit name="distanceUnits" aria-label="Distance Units">
-                            <mat-button-toggle value="m">m</mat-button-toggle>
-                            <mat-button-toggle value="ft">ft</mat-button-toggle>
-                        </mat-button-toggle-group>
-                    </div>
-                    <div class="channel-container">
-                        <ng-container *ngFor="let channel of audysseyData.detectedChannels">
-                            <div class="speaker-name">
-                                {{ channel.commandId | decodeChannelName }}
-                            </div>
-                            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-                                <mat-label>Speaker Config</mat-label>
-                                <mat-select [(ngModel)]="channel.customSpeakerType" [disabled]="channel.commandId.startsWith('SW')">
-                                    <mat-option [value]="undefined"></mat-option>
-                                    <mat-option [value]="'S'">Small</mat-option>
-                                    <mat-option [value]="'L'">Large</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field
-                                appearance="outline"
-                                floatLabel="always"
-                                subscriptSizing="dynamic"
-                                matTooltip="Crossover values can only be set for speakers configured as 'Small'"
-                                [matTooltipDisabled]="channel.customSpeakerType == 'S'"
-                            >
-                                <mat-label>Crossover</mat-label>
-                                <mat-select [(ngModel)]="channel.customCrossover" (selectionChange)="updateChart()" [disabled]="channel.customSpeakerType != 'S'">
-                                    <mat-option [value]="undefined"></mat-option>
-                                    <mat-option *ngFor="let freq of crossoverFreqs" value={{freq.val}}>{{freq.label}} Hz</mat-option>
-                                    <mat-option [value]="'F'">Full Band</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-                                <mat-label>{{ "Distance (" + distanceUnit + ")" }}</mat-label>
-                                <input matInput [value]="channel.channelReport.distance | number: '1.2-3'">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-                                <mat-label>Level</mat-label>
-                                <input matInput [(ngModel)]="channel.customLevel" type="number" step="0.5" min="-12" max="12">
-                            </mat-form-field>
-                        </ng-container>
-                    </div>
-                    <mat-card class="speed-sound-card">
-                        <mat-card-header>
-                            <mat-icon color="accent">info</mat-icon>Speed-of-Sound Distance Fix
-                        </mat-card-header>
-                        <mat-card-content>
-                            <div>
-                                Denon and Marantz AVR models prior to the 2022 model year use an approximation for the speed of sound
-                                to simplify speaker distance and delay calculations.  As a result, speaker delays are set incorrectly.
-                                This can be accounted for by scaling all detected distances by 87.5% (multiply by 0.875).  Clicking the
-                                button below will scale all distance values to correct this issue.
-                                <a href="">More info...</a>
-                            </div>
-                            <button mat-flat-button color="accent" class="speed-sound-btn" (click)="applySpeedOfSoundFix()" [disabled]="speedSoundFixApplied">
-                                {{speedSoundFixApplied ? "Fix Applied" : "Apply Fix" }}
-                            </button>
-                        </mat-card-content>
-                    </mat-card>
-                </mat-expansion-panel>
-                <mat-expansion-panel #targetCurvePanel (closed)="channelPanel.expanded = true">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            Target Curve
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-                    <div class="target-curve-content">
-                        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-                            <mat-label>Channel</mat-label>
-                            <mat-select [(ngModel)]="selectedChannel" (selectionChange)="handleChannelChange()" (click)="drawer.close()" [disabled]="!audysseyData.detectedChannels.length">
-                                <mat-option [value]="houseCurveChannel" class="house-curve-option"> - House Curve - </mat-option>
-                                <mat-option *ngFor="let channel of audysseyData.detectedChannels" [value]=channel>{{ channel.commandId | decodeChannelName }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                        <mat-card class="house-curve-card" *ngIf="selectedChannel==houseCurveChannel">
-                            <mat-card-content>
-                                <div>
-                                    A house curve will apply a common target to all channels (including the subwoofer channel),
-                                    overriding any existing custom target points.  The curve itself won't be saved with the ADY file
-                                    and will need to be re-created each time the file is loaded.
-                                    <br><br>
-                                    Midrange compensation and rolloff frequency can still be configured on a per-channel basis.
-                                </div>
-                                <mat-slide-toggle [(ngModel)]="useHouseCurve" color="accent" style="margin-top: 16px">Use House Curve</mat-slide-toggle>
-                            </mat-card-content>
-                        </mat-card>
-                        <mat-card>
-                            <mat-sidenav-container style="background-color: transparent; border-radius: 4px">
-                                <mat-sidenav-content style="position: relative; overflow: hidden">
-                                    <highcharts-chart 
-                                        [Highcharts]="highcharts"
-                                        [options]="chartOptions"
-                                        [(update)]="chartUpdateFlag"
-                                        [callbackFunction]="chartCallback"
-                                        style="display: block"
-                                    />
-                                    <button
-                                        mat-raised-button
-                                        (click)="drawer.toggle()"
-                                        *ngIf="!(useHouseCurve && selectedChannel != houseCurveChannel)"
-                                        class="edit-control-pts"
-                                        color="accent"
-                                    >
-                                        <span class="rotated">Edit Control Points</span>
-                                    </button>
-                                    <mat-slider
-                                        *ngIf="selectedChannel != houseCurveChannel"
-                                        discrete
-                                        color="accent"
-                                        class="comp-limit-slider"
-                                        min=1
-                                        max=1000
-                                        step=1
-                                        [displayWith]=this.formatRolloffValue.bind(this)
-                                        matTooltip="Move the slider to set an upper limit for sound correction"
-                                    >
-                                        <input
-                                            matSliderThumb
-                                            [value]="selectedChannel.frequencyRangeRolloff"
-                                            (input)="updateRolloff($event)"
-                                        >
-                                    </mat-slider>
-                                </mat-sidenav-content>
-                                <mat-sidenav #drawer position="end" class="control-points-drawer" (closedStart)="targetCurvePoints.save()">
-                                    <div class="content">
-                                        <div class="title">
-                                            Control Points
-                                            <button mat-button class="icon-only-btn close-btn" aria-label="Close" matTooltip="Close panel" (click)="drawer.close()">
-                                                <mat-icon>close</mat-icon>
-                                            </button>
-                                        </div>
-                                        <hr width="100%" style="color: #ccc; margin: 0">
-                                        <app-target-curve-points
-                                            #targetCurvePoints
-                                            style="flex: 1 1 auto; overflow-y: scroll"
-                                            [curvePoints]="customCurvePoints"
-                                            (curvePointsChange)="updateControlPoints($event)"
-                                        />
-                                        <div class="toolbar">
-                                            <button mat-button matTooltip="Copy control points to clipboard" (click)="copyControlPoints()">
-                                                <mat-icon>content_copy</mat-icon>
-                                                Copy
-                                            </button>
-                                            <button mat-button matTooltip="Paste and replace existing control points" (click)="pasteControlPoints()">
-                                                <mat-icon>content_paste</mat-icon>
-                                                Paste
-                                            </button>
-                                            <button mat-button matTooltip="Load control points from file" (click)="controlPtsFileInput.click()">
-                                                <mat-icon>upload_file</mat-icon>
-                                                Load
-                                                <input #controlPtsFileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onControlPtsUpload(controlPtsFileInput.files)" accept=".json"/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </mat-sidenav>
-                            </mat-sidenav-container>
-                        </mat-card>
-                        <div style="display: flex; justify-content: flex-end;">
-                            <mat-slide-toggle
-                                *ngIf="selectedChannel"
-                                color="accent"
-                                labelPosition="before"
-                                [(ngModel)]="selectedChannel!.midrangeCompensation"
-                                (change)="updateTargetCurve()"
-                                [disabled]="!selectedChannel || selectedChannel == houseCurveChannel"
-                            >
-                                Midrange Compensation
-                            </mat-slide-toggle>
-                        </div>
-                        <mat-card class="auto-leveling-card">
-                            <mat-card-header>
-                                <mat-icon color="warn">warning</mat-icon>Auto Leveling Warning
-                            </mat-card-header>
-                            <mat-card-content>
-                                <div>
-                                    In order to keep levels matched across channels Audyssey automatically shifts any target curve
-                                    up or down based on the curve's gain at certain frequencies (between 50 - 80Hz for subwoofers;
-                                    100Hz for all other channels).  To account for this, manually adjust the gain for affected
-                                    channels by the amount of gain in the target curve at these frequencies.
-                                    <a href="">More info...</a>
-                                </div>
-                            </mat-card-content>
-                        </mat-card>
-                    </div>
-                </mat-expansion-panel>
-            </mat-accordion>
-        </mat-card>
+        <mat-accordion class="info-panels">
+            <mat-expansion-panel #channelPanel (closed)="targetCurvePanel.expanded = true" expanded>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Channel Info
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <channel-info-panel
+                    [(channelData)]="audysseyData.detectedChannels"
+                />
+            </mat-expansion-panel>
+            <mat-expansion-panel #targetCurvePanel (closed)="channelPanel.expanded = true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Target Curve
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <target-curve-panel
+                    [(channelData)]="audysseyData.detectedChannels"
+                    [targetCurve]="audysseyData.enTargetCurveType"
+                />
+            </mat-expansion-panel>
+        </mat-accordion>
     </div>
 </main>

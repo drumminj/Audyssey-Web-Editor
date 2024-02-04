@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from "@angular/forms";
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from "@angular/material/button";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatCardModule } from "@angular/material/card";
@@ -14,26 +12,36 @@ import { MatSidenavModule } from "@angular/material/sidenav";
 import { MatSliderModule } from "@angular/material/slider";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { HighchartsChartModule } from "highcharts-angular";
 
 import { AppComponent } from './app.component';
-import { DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
-import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
-import { PointsConverterPipe } from './target-curve-points/points-converter.pipe';
-
-import { SystemInfoCardComponent } from './components/system-info-card/system-info-card.component';
-import { DecodeEqTypePipe } from './components/system-info-card/decode-eq-type.pipe';
+import { DecodeChannelNamePipe } from 'helper-functions/decode-channel-name.pipe';
+import { DecodeCrossoverPipe } from 'helper-functions/decode-crossover.pipe';
+import { ChannelInfoPanelComponent } from 'components/channel-info-panel/channel-info-panel.component';
+import { SystemInfoCardComponent } from 'components/system-info-card/system-info-card.component';
+import { TargetCurveChartCardComponent } from 'components/target-curve-chart-card/target-curve-chart-card.component';
+import { TargetCurvePanelComponent } from 'components/target-curve-panel/target-curve-panel.component';
+import { TargetCurvePointsComponent } from 'components/target-curve-points/target-curve-points.component';
+import { PointsConverterPipe } from 'components/target-curve-points/points-converter.pipe';
+import { DecodeEqTypePipe } from 'components/system-info-card/decode-eq-type.pipe';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    TargetCurvePointsComponent,
-    PointsConverterPipe,
+    ChannelInfoPanelComponent,
     DecodeChannelNamePipe,
+    DecodeCrossoverPipe,
     DecodeEqTypePipe,
+    PointsConverterPipe,
     SystemInfoCardComponent,
+    TargetCurveChartCardComponent,
+    TargetCurvePointsComponent,
+    TargetCurvePanelComponent,
+
   ],
   imports: [
     BrowserModule,

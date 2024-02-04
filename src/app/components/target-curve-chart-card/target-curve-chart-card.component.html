@@ -1,0 +1,57 @@
+<mat-card class="curve-chart-card">
+    <mat-sidenav-container style="background-color: transparent; border-radius: 4px">
+        <mat-sidenav-content style="position: relative; overflow: hidden">
+            <highcharts-chart 
+                [Highcharts]="highcharts"
+                [options]="chartOptions"
+                [(update)]="chartUpdateFlag"
+                [callbackFunction]="chartCallback"
+                style="display: block"
+            />
+            <button
+                mat-raised-button
+                (click)="drawer.toggle()"
+                *ngIf="canEditControlPoints"
+                class="edit-control-pts"
+                color="accent"
+            >
+                <span class="rotated">Edit Control Points</span>
+            </button>
+            <mat-slider
+                *ngIf="canSetCorrectionFreqLimit"
+                discrete
+                color="accent"
+                class="comp-limit-slider"
+                min=1
+                max=1000
+                step=1
+                [displayWith]=this.formatRolloffValue.bind(this)
+                matTooltip="Drag slider to set the upper limit to apply sound correction"
+                style="z-index: 2"
+            >
+                <input
+                    matSliderThumb
+                    [value]="this.rolloffSliderVal"
+                    (input)="updateRolloff($event)"
+                >
+            </mat-slider>
+        </mat-sidenav-content>
+        <mat-sidenav #drawer position="end" class="control-points-drawer" (closedStart)="targetCurvePoints.save()">
+            <div class="content">
+                <div class="title">
+                    Control Points
+                    <button mat-button class="icon-only-btn close-btn" aria-label="Close" matTooltip="Close panel" (click)="drawer.close()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
+                <hr width="100%" style="color: #ccc; margin: 0">
+                <target-curve-points
+                    #targetCurvePoints
+                    [controlPoints]="controlPoints"
+                    (controlPointsChange)="updateControlPoints($event)"
+                    style="flex: 1 1 0"
+                />
+            </div>
+        </mat-sidenav>
+    </mat-sidenav-container>
+</mat-card>
