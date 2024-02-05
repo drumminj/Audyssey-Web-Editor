@@ -2,7 +2,7 @@
     <mat-card-content class="header">
         <h1>Audyssey Editor</h1>
 
-        <span style="flex-grow: 1"></span>
+        <div style="flex-grow: 1"></div>
 
         <a href="https://t.me/vonder" class="icon-link" title="Contact me in Telegram" target='_blank'>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240.1 240.1" width="20" >
@@ -17,7 +17,7 @@
         </a>
 
         <a href='https://ko-fi.com/vladi_ed' class="icon-link" target='_blank'>
-          <img src='https://storage.ko-fi.com/cdn/cup-border.png' alt='Buy Me a Coffee' />
+          <img src='https://storage.ko-fi.com/cdn/cup-border.png' alt='Buy Me a Coffee' title='Buy Me a Coffee' />
           <span>Donate</span>
         </a>
     </mat-card-content>
@@ -57,7 +57,7 @@
             (dynamicVolumeChange)="audysseyData.dynamicVolume=$event"
             (targetCuveChange)="audysseyData.enTargetCurveType=$event"
             />
-        <mat-card>
+        <mat-card class="export-card">
             <button mat-flat-button color="primary" (click)="exportFile()" matTooltip="Export and download current settings as ADY file">
                 <mat-icon>file_download</mat-icon>
                 Export
@@ -90,4 +90,10 @@
             </mat-expansion-panel>
         </mat-accordion>
     </div>
+    <mat-card class="export-card-alt">
+        <button mat-flat-button color="primary" (click)="exportFile()" matTooltip="Export and download current settings as ADY file">
+            <mat-icon>file_download</mat-icon>
+            Export
+        </button>
+    </mat-card>
 </main>

@@ -2,6 +2,7 @@ $muted-text: #999;
 
 .channel-container {
   align-content: center;
+  align-items: center;
   column-gap: 6px;
   grid-template-columns: minmax(min-content, 0.7fr) repeat(4, 1fr);
   display: grid;

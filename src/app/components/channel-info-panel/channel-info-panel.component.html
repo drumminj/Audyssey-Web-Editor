@@ -34,11 +34,11 @@
         </mat-form-field>
         <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
             <mat-label>{{ "Distance (" + distanceUnit + ")" }}</mat-label>
-            <input matInput [ngModel]="distanceValues[i] | number: distanceFormat" type="number" [step]="distanceStep" (ngModelChange)="handleDistanceChange($event, i)">
+            <input matInput [ngModel]="distanceValues[i] | number: distanceFormat" type="number" [step]="distanceStep" (ngModelChange)="handleDistanceChange($event, i)" style="text-align: right">
         </mat-form-field>
         <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
             <mat-label>Level</mat-label>
-            <input matInput [(ngModel)]="channel.customLevel" type="number" step="0.5" min="-12" max="12" (ngModelChange)="channelDataChange.emit(channelData)">
+            <input matInput [(ngModel)]="channel.customLevel" type="number" step="0.5" min="-12" max="12" (ngModelChange)="channelDataChange.emit(channelData)" style="text-align: right">
         </mat-form-field>
     </ng-container>
 </div>

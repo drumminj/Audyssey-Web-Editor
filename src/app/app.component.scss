@@ -1,12 +1,13 @@
 $layout-gap: 20px;
+$layout-gap-small: 10px;
 
 :host {
   color: #333;
   display: block;
   padding: $layout-gap;
 
-  @media (max-width: 500px) {
-    padding: 0
+  @media (max-width: 1000px) {
+    padding: $layout-gap-small
   }
 
   // Global adjustment to sizing of form field wrappers
@@ -14,6 +15,14 @@ $layout-gap: 20px;
     min-height: unset !important;
     padding: 10px 0 !important;
     width: unset !important;
+  }
+
+  ::ng-deep mat-form-field div.mdc-notched-outline__notch {
+    max-width: calc(100% - 24px) !important;
+
+    label {
+      text-overflow: ellipsis;
+    }
   }
 
   // Global style for buttons
@@ -107,17 +116,11 @@ main.loading .load-overlay {
     }
   }
 
-  @media (max-width: 500px) {
-    select, span {
+  @media (max-width: 600px) {
+    span {
       display: none;
     }
-
-    h1 {
-      margin-top: 5px;
-      margin-bottom: 10px;
-      text-align: center;
-      width: 100%;
-    }
+    gap: 16px;
   }
 }
 
@@ -128,16 +131,23 @@ main {
   margin-top: $layout-gap;
   position: relative;
 
-  @media (max-width: 500px) {
+  @media (max-width: 1000px) {
+    gap: $layout-gap-small;
+    margin-top: $layout-gap-small;
+  }
+
+  @media (max-width: 800px) {
+    align-items: stretch;
     flex-direction: column;
+
+    .left-panel {
+      max-width: unset;
+    }
   }
 }
 
 .info-panels {
   --mat-expansion-header-text-size: 16px;
-  @media (max-width: 600px) {
-    width: 95%;
-  }
 }
 
 .left-panel {
@@ -172,7 +182,27 @@ main {
 }
 
 .right-panel {
-  flex: 1 1 0;
+  flex: 1 1 auto;
   overflow: hidden;
   position: relative;
+}
+
+.export-card-alt {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  .left-panel .export-card {
+    display: none;
+  };
+
+  .export-card-alt {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ::ng-deep mat-expansion-panel.mat-expansion-panel-spacing {
+    margin: 8px 0;
+  }
 }
