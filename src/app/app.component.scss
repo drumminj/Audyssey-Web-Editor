@@ -206,3 +206,9 @@ main {
     margin: 8px 0;
   }
 }
+
+@media (max-width: 1000px) {
+  ::ng-deep mat-expansion-panel.mat-expansion-panel-spacing {
+    margin: 8px 0;
+  }
+}
