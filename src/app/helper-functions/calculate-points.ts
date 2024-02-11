@@ -38,24 +38,23 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
     if (x == count / 2) break;
   }
 
-  const filteredPoints =  points.filter(function(_, i) {
-    if (i > 2500) return (i % 60 === 0);
-    if (i > 1500) return (i % 25 === 0);
-    if (i > 1000) return (i % 20 === 0);
-    if (i > 800) return (i % 15 === 0);
-    if (i > 500) return (i % 5 === 0);
-    return i >= 4; // remove everything less than 10Hz
-  });
+  return points;
+  // const filteredPoints =  points.filter(function(_, i) {
+  //   if (i > 2500) return (i % 60 === 0);
+  //   if (i > 1500) return (i % 25 === 0);
+  //   if (i > 1000) return (i % 20 === 0);
+  //   if (i > 800) return (i % 15 === 0);
+  //   if (i > 500) return (i % 5 === 0);
+  //   return i >= 4; // remove everything less than 10Hz
+  // });
+  // console.log('points', points.length);
+  // console.log('filteredPoints', filteredPoints.length);
 
-  console.log('points', points.length);
-  console.log('filteredPoints', filteredPoints.length);
-
-  return filteredPoints;
+  // return filteredPoints;
 }
 
 
-function LinSpacedFracOctaveSmooth(origArr: any[], frac = 24, smoothStart = 50, startFreq = 1, freqStep = 1 / 48) {
-// function LinSpacedFracOctaveSmooth(origArr: any[], frac = 16, smoothStart = 40, startFreq = 1, freqStep = 1 / 48) {
+function LinSpacedFracOctaveSmooth(origArr: any[], frac = 24, smoothStart = 0, startFreq = 1, freqStep = 1 / 48) {
   const smoothed = origArr.slice(smoothStart);
   const passes = 8;
   // Scale octave frac to allow for number of passes
@@ -85,5 +84,5 @@ function LinSpacedFracOctaveSmooth(origArr: any[], frac = 24, smoothStart = 50, 
     }
   }
 
-  return [...origArr.slice(0, smoothStart),...smoothed];
+  return [...origArr.slice(0, smoothStart), ...smoothed];
 }
