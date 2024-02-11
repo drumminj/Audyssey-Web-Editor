@@ -16,6 +16,7 @@ export class TargetCurvePanelComponent {
   }
   set channelData(value: DetectedChannel[]) {
     this._channelData = value;
+    this.cachedResponseData = new Array(value.length);
     this.setSelectedChannel(value.length > 0 ? 0 : this.HOUSE_CURVE_CHANNEL);
   }
   private _channelData!: DetectedChannel[];
@@ -44,17 +45,21 @@ export class TargetCurvePanelComponent {
     trimAdjustment: ''
   }
 
-  selectedChannel = this.HOUSE_CURVE_CHANNEL;
-  selectedChannelData = this.houseCurveChannelData;
-  selectedChannelResponseData: number[][] = [[]];
-  selectedChannelControlPts: ControlPoint[] = [];
+  selectedChannel = this.HOUSE_CURVE_CHANNEL;       // index of currently selected channel (house curve is -1)
+  selectedChannelData = this.houseCurveChannelData; // DetectedChannelData for the currently selected channel
+  selectedChannelResponseData: number[][] = [[]];   // freq response data for the currently selected channel
+  selectedChannelControlPts: ControlPoint[] = [];   // control points (if any) for the currently selected channel
+  cachedResponseData: number[][][] = [];            // cache freq response data for each channel when computed
 
   setSelectedChannel(value: number) {
     this.selectedChannel = value;
     this.selectedChannelData = this.selectedChannel === this.HOUSE_CURVE_CHANNEL
       ? this.houseCurveChannelData
       : this._channelData[this.selectedChannel];
-    this.selectedChannelResponseData = calculatePoints(this.selectedChannelData.responseData[0]);
+    if (this.selectedChannel != this.HOUSE_CURVE_CHANNEL) {
+      this.cachedResponseData[value] = this.cachedResponseData[value] || calculatePoints(this.selectedChannelData.responseData[0]);
+    }
+    this.selectedChannelResponseData = this.cachedResponseData[value]
     this.selectedChannelControlPts = this.selectedChannelData.customTargetCurvePoints
       ? this.selectedChannelData.customTargetCurvePoints.map(pt => {
           const coords = pt.replace(/[{}]/g, '').split(',');
