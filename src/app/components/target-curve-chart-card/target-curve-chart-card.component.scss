@@ -62,3 +62,18 @@
     white-space: nowrap;
   }
 }
+
+::ng-deep {
+  .tooltip-header {
+    background-color: #555;
+    color: #fff;
+    font-weight: bold;
+    margin-bottom: 2px;
+    padding: 3px 8px;
+    text-align: center;
+  }
+
+  .tooltip-data {
+    text-align: right;
+  }
+}

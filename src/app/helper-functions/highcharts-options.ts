@@ -1,3 +1,5 @@
+import { Point } from "highcharts";
+ 
 export const options: Highcharts.Options = {
   // Avoid the chart scaling down to an unreasonable height for a fixed
   // aspect ratio
@@ -17,30 +19,13 @@ export const options: Highcharts.Options = {
     height: (9 / 16 * 100) + '%', // 16:9 ratio
     zooming: {
       type: 'x',
-      // key: 'ctrl',
     },
     panKey: 'shift',
     panning: {
       enabled: true,
-      // type: 'x'
+      type: 'x'
     },
     type: 'spline',
-    // events: {
-    //   // add points on CLick
-    //   click: function (e) {
-    //     // @ts-ignore
-    //     const x = Math.round(e.xAxis[0].value);
-    //     // @ts-ignore
-    //     const y = Math.round(e.yAxis[0].value);
-    //
-    //     console.log(x, y);
-    //     console.log(e);
-    //
-    //     this.series[2].addPoint({
-    //       x, y
-    //     });
-    //   }
-    // }
   },
   boost: {
     // allowForce: true,
@@ -49,7 +34,6 @@ export const options: Highcharts.Options = {
     useGPUTranslations: true
   },
   exporting: {
-    sourceWidth: 1920,
     menuItemDefinitions: {
       xScale: {
         text: '&nbsp;&nbsp; Toggle linear/log scale'
@@ -77,14 +61,13 @@ export const options: Highcharts.Options = {
   },
   accessibility: { enabled: false },
   title: {
-    text: '_'
+    text: '_' // use something that will allocate space for context menu button but not be useful
   },
   tooltip: {
-    headerFormat: '<b>{point.x:,.0f}</b> Hz<br/>',
-    // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+    headerFormat: '',
+    pointFormat: '',
     valueDecimals: 1,
-    valueSuffix: ' dB',
-    // shared: true,
+    useHTML: true,
   },
   xAxis: {
     min: 10,
@@ -95,35 +78,13 @@ export const options: Highcharts.Options = {
     accessibility: {
       description: 'Frequency'
     },
-    // minRange: 1, // Set the minimum range for zooming - not working
   },
   yAxis: {
     min: -20,
     max: 25,
     title: { text: 'Amplitude (dB)' },
     crosshair: true,
-
-    // tickInterval: 5,
-    // minorTickInterval: 5
   },
-  // plotOptions: {
-  //   series: {
-  //     stickyTracking: false,
-  //     marker: {
-  //       enabled: false,
-  //     },
-  //     point: {
-  //       events: {
-  //         click: function (ev) {
-  //           console.log(ev)
-  //           if (this.series.data.length > 1 && ev.ctrlKey) {
-  //             this.remove();
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // },
   legend: {
     enabled: false
   },
@@ -135,18 +96,18 @@ export const options: Highcharts.Options = {
 
 export const seriesOptions: Highcharts.SeriesOptionsType[] = [
   {
-    name: 'Selected Channel',
+    name: 'Measured Response',
     data: [],
     type: 'line',
     lineWidth: 1, // boost module renders only 1px lineWidth
-    showInNavigator: true,
+    showInNavigator: false,
     dashStyle: 'Solid',
     zoneAxis: 'y',
     marker: {
       enabled: false,
       states: {
         hover: {
-          enabled: false,
+          enabled: true,
         }
       }
     },
@@ -189,38 +150,64 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
         color: '#ff0000'
       },
     ],
+    stickyTracking: false,
+    tooltip: {
+      headerFormat: '<div class="tooltip-header">{series.name}</div>',
+      pointFormatter: function(this: Point) {
+      const freqStr = this!.x > 1000
+        ? `${(this!.x / 1000).toFixed(2)} kHz`
+        : `${Math.round(this!.x)} Hz`;
+      return `
+        <table class="tooltip-data">
+          <tr>
+            <td>Frequency:</td>
+            <td><b>${freqStr}</b></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Amplitude:</td>
+            <td><b>${this!.y! > 0 ? "+" : ""}${this!.y!.toFixed(1)} dB</b></td>
+            <td style="color: ${this!.color}">●</td>
+          </tr>
+        </table>`;
+      },
+    }
   },
   {
-    name: 'Subwoofer',
+    name: 'Target Curve',
     data: [],
-    dashStyle: 'Dot',
-    lineWidth: 0.8,
     type: 'spline',
-    color: 'black',
-  },
-  {
-    name: 'Target curve',
-    data: [],
-    // lineWidth: 2,
-    type: 'spline',
-    color: 'green',
+    color: 'blue',
     marker: {
-      // lineWidth: 2,
-      // radius: 1,
-      // enabled: false,
       symbol: 'round'
     },
-    // states: { hover: { enabled: false } },
 
     dragDrop: {
       draggableY: true,
       draggableX: true,
       dragMaxY: 12, dragMinY: -12,
-      // dragPrecisionX: 10
     },
     stickyTracking: false,
     allowPointSelect: true,
 
-    enableMouseTracking: false // to disable dragging
+    tooltip: {
+      headerFormat: '<div class="tooltip-header">{series.name}</div>',
+      pointFormatter: function(this: Point) {
+      const freqStr = this!.x > 1000
+        ? `${(this!.x / 1000).toFixed(2)} kHz`
+        : `${Math.round(this!.x)} Hz`
+      return `
+        <table class="tooltip-data">
+          <tr>
+            <td>Frequency:</td>
+            <td><b>${freqStr}</b></td>
+          </tr>
+          <tr>
+            <td>Gain:</td>
+            <td><b>${this!.y! > 0 ? "+" : ""}${this!.y!.toFixed(1)} dB</b></td>
+          </tr>
+        </table>`;
+      },
+    },
   }
 ];

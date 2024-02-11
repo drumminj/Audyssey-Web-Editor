@@ -219,7 +219,7 @@ export class TargetCurveChartCardComponent {
     console.log('updateTargetCurve() data: ', data);
 
     if (this.targetCurve) {
-      this.chartOptions.series![2] = {
+      this.chartOptions.series![1] = {
         data,
         type: 'spline',
       };
